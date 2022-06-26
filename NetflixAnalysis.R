@@ -210,11 +210,11 @@ View(df_count_genres)
 write.csv(df_count_genres, "dataset02_clear.csv", row.names = FALSE)
 
 
-#-------------------- dataset 03
+#-------------------- dataset 03 (Revisar a partir daqui)
 
 
 # Renomer df anterior
-df_sun_burst <- rename(df_count_genres, label = country_name)
+df_sun_burst <- df_count_genres
 names(df_sun_burst) <- c("label", "genres", "n")
 View(df_sun_burst)
 
@@ -225,10 +225,12 @@ View(df_sun_burst)
 # Ajuste de nome
 
 df_sun_burst$parent = c("Total - ")
-df_sun_burst$parent <- paste(df_sun_burst$parant, df_sun_burst$genres)
+df_sun_burst$parent <- paste(df_sun_burst$parent, df_sun_burst$genres)
+
 df_sun_burst$id = c(" - ")
 df_sun_burst$id <- paste(df_sun_burst$parent, df_sun_burst$id)
 df_sun_burst$id <- paste(df_sun_burst$id, df_sun_burst$label)
+
 str(df_sun_burst)
 View(df_sun_burst)
 
@@ -243,10 +245,13 @@ str(df_agg)
 View(df_agg)
 
 df_agg$genres <- c(NA)
+
 df_agg$parent <- c("Total")
+
 df_agg$id <- c(" - ")
 df_agg$id <- paste(df_agg$parent, df_agg$id)
 df_agg$id <- paste(df_agg$id, df_agg$label)
+
 str(df_agg)
 View(df_agg)
 
@@ -270,3 +275,45 @@ View(df_sun_burst)
 
 #Salvar df limpo
 write.csv(df_count_genres, "dataset03_clear.csv", row.names = FALSE)
+
+
+#-------------------- dataset 04
+
+# Reducao para apenas os Top 10 para evitar problemas de performance nos graficos
+df_top10_sunburst <- df_sun_burst[-c(1:29),]
+str(df_top10_sunburst)
+View(df_top10_sunburst)
+
+#Top 10 por pais 
+df_top10_sunburst <- df_top10_sunburst %>%
+  group_by(label) %>%
+  top_n(10, n)
+
+View(df_top10_sunburst)
+
+
+# Recalculando os totais e combinando os df's
+
+df_new_top10 <- aggregate(df_top10_sunburst$n, list(df_top10_sunburst$parent), FUN=sum)
+View(df_new_top10)
+
+names(df_new_top10) <- c("id", "n")
+View(df_new_top10)
+
+df_new_top10$label = sub("Total - ", "", df_new_top10$id)
+
+df_new_top10$parent = c("Total")
+View(df_new_top10)
+
+total = sum(df_new_top10$n)
+total
+View(df_new_top10)
+
+
+df_top10_sunburst <- rbind(df_new_top10, df_top10_sunburst)
+df_top10_sunburst <- rbind(c("Total", total, NA, NA, "Total"), df_top10_sunburst)
+
+df_top10_sunburst$n <- as.numeric(df_top10_sunburst$n)
+str(df_top10_sunburst)
+View(df_top10_sunburst)
+
