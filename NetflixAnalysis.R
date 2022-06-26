@@ -210,7 +210,7 @@ View(df_count_genres)
 write.csv(df_count_genres, "dataset02_clear.csv", row.names = FALSE)
 
 
-#-------------------- dataset 03 (Revisar a partir daqui)
+#-------------------- dataset 03
 
 
 # Renomer df anterior
@@ -317,3 +317,9 @@ df_top10_sunburst$n <- as.numeric(df_top10_sunburst$n)
 str(df_top10_sunburst)
 View(df_top10_sunburst)
 
+
+#Salvar df limpo
+write.csv(df_top10_sunburst, "dataset04_clear.csv", row.names = FALSE)
+
+
+#-------------------- dataset 05
