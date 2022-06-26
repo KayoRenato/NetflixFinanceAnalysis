@@ -211,3 +211,62 @@ write.csv(df_count_genres, "dataset02_clear.csv", row.names = FALSE)
 
 
 #-------------------- dataset 03
+
+
+# Renomer df anterior
+df_sun_burst <- rename(df_count_genres, label = country_name)
+names(df_sun_burst) <- c("label", "genres", "n")
+View(df_sun_burst)
+
+# Removendo o '-' dos generos
+df_sun_burst$genres <- sub("-", " ", df_sun_burst$genres)
+View(df_sun_burst)
+
+# Ajuste de nome
+
+df_sun_burst$parent = c("Total - ")
+df_sun_burst$parent <- paste(df_sun_burst$parant, df_sun_burst$genres)
+df_sun_burst$id = c(" - ")
+df_sun_burst$id <- paste(df_sun_burst$parent, df_sun_burst$id)
+df_sun_burst$id <- paste(df_sun_burst$id, df_sun_burst$label)
+str(df_sun_burst)
+View(df_sun_burst)
+
+
+# Agregacao 
+
+df_agg <- aggregate(df_sun_burst$n, list(df_sun_burst$genres), FUN=sum)
+View(df_agg)
+
+names(df_agg) <- c("label", "n")
+str(df_agg)
+View(df_agg)
+
+df_agg$genres <- c(NA)
+df_agg$parent <- c("Total")
+df_agg$id <- c(" - ")
+df_agg$id <- paste(df_agg$parent, df_agg$id)
+df_agg$id <- paste(df_agg$id, df_agg$label)
+str(df_agg)
+View(df_agg)
+
+# Calculo Soma
+
+total = sum(df_agg$n)
+total
+
+# Combinando em um df final
+df_sun_burst <- rbind(df_agg, df_sun_burst)
+View(df_sun_burst)
+
+df_sun_burst <- rbind(c("Total", total, NA, NA, "Total"), df_sun_burst)
+View(df_sun_burst)
+
+df_sun_burst <- df_sun_burst[,-c(3)]
+View(df_sun_burst)
+df_sun_burst$n <- as.numeric(df_sun_burst$n)
+str(df_sun_burst)
+View(df_sun_burst)
+
+#Salvar df limpo
+write.csv(df_count_genres, "dataset03_clear.csv", row.names = FALSE)
