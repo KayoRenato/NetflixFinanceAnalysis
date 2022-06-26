@@ -1,4 +1,6 @@
 .DS_Store
+.RData
+.Rhistory
 dataset01_clear.csv
 dataset02_clear.csv
 dataset03_clear.csv
