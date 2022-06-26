@@ -323,3 +323,50 @@ write.csv(df_top10_sunburst, "dataset04_clear.csv", row.names = FALSE)
 
 
 #-------------------- dataset 05
+
+# Filtrando o df anterior para um novo
+
+df_Total <- df_top10_sunburst[-c(1),]
+
+df_Total$parent = sub("Total - ", "", df_Total$parent)
+df_Total$parent = sub("Total", NA, df_Total$parent)
+
+df_Total$id = sub("Total - ", "", df_Total$id)
+
+View(df_Total)
+
+
+#Salvar df limpo
+write.csv(df_Total, "dataset05_clear.csv", row.names = FALSE)
+
+
+#-------------------- dataset 06
+
+df_country_tree <- df_Total[-c(1:16), ]
+
+names(df_country_tree)[names(df_country_tree) == 'label'] <- 'parents'
+names(df_country_tree)[names(df_country_tree) == 'parent'] <- 'labels'
+
+df_country_tree$id = c(" - ")
+df_country_tree$id = paste(df_country_tree$parents, df_country_tree$id)
+df_country_tree$id = paste(df_country_tree$id, df_country_tree$labels)
+
+View(df_country_tree)
+
+df_countries <- aggregate(df_country_tree$n, list(df_country_tree$parents), FUN=sum)
+names(df_countries) <- c("labels", "n")
+
+df_countries$id <- df_countries$labels
+
+df_countries$parents <- c(NA)
+
+str(df_countries)
+View(df_countries)
+
+df_country_tree <- rbind(df_country_tree, df_countries)
+View(df_country_tree)
+
+
+
+#Salvar df limpo
+write.csv(df_country_tree, "dataset06_clear.csv", row.names = FALSE)
