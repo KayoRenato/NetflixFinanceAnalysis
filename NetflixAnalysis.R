@@ -71,7 +71,7 @@ View(df_countryCod)
 
 #-------------------- Limpeza dos Dados ------------------
 
-#dataset 01
+#-------------------- dataset 01
 
 #Coluna com a diferenca de planos standard - basico
 df_netflix$basic_standard_diff = (df_netflix$Cost.Per.Month...Standard.... - df_netflix$Cost.Per.Month...Basic....) 
@@ -137,7 +137,6 @@ str(df_01)
 summary(df_01)
 View(df_01)
 
-summary(df_countryCod)
 
 # Merge do df de codigo pais para o choropleth map
 df_countryCod <- df_countryCod[, c(1,3)]
@@ -145,3 +144,70 @@ df_01 <- merge(df_01, df_countryCod, by.x = c("Country"), by.y = c("English.shor
 str(df_01)
 summary(df_01)
 View(df_01)
+
+#Salvar df limpo
+write.csv(df_01, "dataset01_clear.csv", row.names = FALSE)
+
+
+#-------------------- dataset 02
+
+df_genero <- df_IMDB[, -c(1, 4:8)]
+names(df_genero)[names(df_genero) == 'primaryTitle'] <- 'show_title'
+str(df_genero)
+summary(df_genero)
+View(df_genero)
+
+
+# Associar o genero com os tops 10 shows
+df_top_genero <- merge(df_top10, df_genero, by = "show_title")
+str(df_top_genero)
+summary(df_top_genero)
+View(df_top_genero)
+
+# Manter apenas 1 entrada para cada top 10
+df_top_genero <- df_top_genero[(df_top_genero$category == 'Films' & df_top_genero$titleType == 'movie') | (df_top_genero$category == 'TV' & df_top_genero$titleType == 'tvSeries'), ]
+str(df_top_genero)
+summary(df_top_genero)
+View(df_top_genero)
+
+
+df_top_genero <- distinct(df_top_genero, df_top_genero$show_title, df_top_genero$week, df_top_genero$country_name, df_top_genero$category, df_top_genero$titleType, df_top_genero$cumulative_weeks_in_top_10, .keep_all = TRUE) 
+str(df_top_genero)
+summary(df_top_genero)
+View(df_top_genero)
+
+# Manter apenas a informacai de genero de filme por pais
+df_top_genero_pais <- df_top_genero[, -c(1, 3:9)]
+str(df_top_genero_pais)
+summary(df_top_genero_pais)
+View(df_top_genero_pais)
+
+#Pivot do df
+
+df_top_genero_pais <- separate(df_top_genero_pais, c("genres"), c("genres1", "genres2", "genres3"), sep = ",")
+str(df_top_genero_pais)
+summary(df_top_genero_pais)
+View(df_top_genero_pais)
+
+df_top_genero_pais <- pivot_longer(df_top_genero_pais, c("genres1", "genres2", "genres3"), names_to = "genres123", values_to = "genres")
+str(df_top_genero_pais)
+summary(df_top_genero_pais)
+View(df_top_genero_pais)
+
+df_count_genres <- count(df_top_genero_pais, df_top_genero_pais$country_name, df_top_genero_pais$genres)
+View(df_count_genres)
+
+df_count_genres <- na.omit(df_count_genres)
+View(df_count_genres)
+
+
+df_count_genres <- subset(df_count_genres, df_count_genres$`df_top_genero_pais$genres` != "\\N")
+df_count_genres$n <- as.numeric(df_count_genres$n)
+str(df_count_genres)
+View(df_count_genres)
+
+#Salvar df limpo
+write.csv(df_count_genres, "dataset02_clear.csv", row.names = FALSE)
+
+
+#-------------------- dataset 03
